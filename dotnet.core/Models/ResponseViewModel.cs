@@ -10,20 +10,15 @@
       Message = exp.Message;
     }
 
+    public ResponseViewModel(PagedInfo? paged, IEnumerable<TModel>? model)
+    {
+      List = model;
+      Paged = paged;
+    }
+
     public ResponseViewModel(TModel model)
     {
-      if (model != null)
-      {
-        if (model is PagedData<TModel> paged)
-        {
-          List = paged.List;
-          Paged = paged.Paged;
-        }
-        else
-        {
-          Data = model;
-        }
-      }
+      Data = model;
     }
 
     #region Properties ####################################################################################################################

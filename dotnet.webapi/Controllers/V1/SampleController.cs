@@ -83,7 +83,7 @@ namespace dotnet.Controllers.V1
     {
       var result = _user.PagedListAsync(model);
       Core::DatabaseException.ThrowIfEmptyResult(() => result.List == null);
-     
+
       return Task.FromResult(result);
     }
 

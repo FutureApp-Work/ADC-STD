@@ -15,7 +15,16 @@ namespace dotnet.Core
     {
       if (context.Result is ObjectResult result && result.Value != null)
       {
-        context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value));
+        if (result.Value.GetType().IsGenericType &&
+           result.Value.GetType().GetGenericTypeDefinition().IsAssignableTo(typeof(PagedData<>)))
+        {
+          var paged = (IPagedData<object>)result.Value;
+          context.Result = new ObjectResult(new ResponseViewModel<object>(paged.GetPaged(), paged.GetList()));
+        }
+        else
+        {
+          context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value));
+        }
       }
 
       return base.OnResultExecutionAsync(context, next);
