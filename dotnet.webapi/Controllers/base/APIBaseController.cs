@@ -19,7 +19,7 @@ namespace dotnet.Controllers
     #region Public Functions ##############################################################################################################
 
     [HttpGet("{id}")]
-    public virtual Task<VModel?> GetAsync([FromRoute] TKey id)
+    public virtual Task<VModel> GetAsync([FromRoute] TKey id)
     {
       throw Core::NotImplementedException.Create();
     }

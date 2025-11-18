@@ -22,28 +22,28 @@ namespace dotnet.Core
 
     #region Public Functions ##############################################################################################################
 
-    public Task<bool> CreateAsync(TEntity entity)
+    protected Task<bool> CreateAsync(TEntity entity)
     {
       CreateCore(entity);
 
       return CommitAsync();
     }
 
-    public Task<bool> UpdateAsync(TEntity entity)
+    protected Task<bool> UpdateAsync(TEntity entity)
     {
       UpdateCore(entity);
 
       return CommitAsync();
     }
 
-    public Task<bool> DeleteAsync(TEntity entity)
+    protected Task<bool> DeleteAsync(TEntity entity)
     {
       DeleteCore(entity);
 
       return CommitAsync();
     }
 
-    public Task<TEntity?> GetByIdAsync(TKey id)
+    protected Task<TEntity?> GetByIdAsync(TKey id)
     {
       var qry = GetAvailable();
 
@@ -57,7 +57,7 @@ namespace dotnet.Core
       return qry.FirstOrDefaultAsync();
     }
 
-    public IQueryable<TEntity> GetAvailable()
+    protected IQueryable<TEntity> GetAvailable()
     {
       var qry = All;
 
@@ -71,7 +71,7 @@ namespace dotnet.Core
       return qry;
     }
 
-    public IQueryable<TEntity> GetAvailable(Func<TEntity, bool>? func = null)
+    protected IQueryable<TEntity> GetAvailable(Func<TEntity, bool>? func = null)
     {
       var rtn = GetAvailable();
 
