@@ -13,9 +13,9 @@ namespace dotnet.Core
 
     public override Task OnResultExecutionAsync(Filter::ResultExecutingContext context, Filter::ResultExecutionDelegate next)
     {
-      if (context.Result is ObjectResult result)
+      if (context.Result is ObjectResult result && result.Value != null)
       {
-        context.Result = new ObjectResult(new APIResponseViewModel(result.Value));
+        context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value));
       }
 
       return base.OnResultExecutionAsync(context, next);

@@ -100,6 +100,25 @@ namespace dotnet.Controllers.V1
       return new UserViewmodel { Id = id };
     }
 
+    public override Task<PagedData<UserViewmodel>> ListAsync([FromBody] PagedData<UserViewmodel> model)
+    {
+      var data = _user.GetAvailable()
+                      .OrderBy(x => x.Sorting)
+                      .ThenByDescending(x => x.Id)
+                      .Select(x => new UserViewmodel
+                      {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Birthday = x.Birthday,
+                        JoinAt = x.JoinAt,
+                        Gender = x.Gender,
+                        State = x.State,
+                      });
+      model.PagedAndSort(data);
+
+      return Task.FromResult(model);
+    }
+
     #endregion ############################################################################################################################
 
     #region Private Functions #############################################################################################################

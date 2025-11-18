@@ -1,5 +1,4 @@
 ﻿using dotnet.Core;
-using dotnet.Models;
 using dotnet.Models.Testing;
 
 namespace dotnet.Services.Testing

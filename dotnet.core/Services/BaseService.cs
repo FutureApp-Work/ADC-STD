@@ -63,7 +63,7 @@ namespace dotnet.Core
 
       if (typeof(ICodeState).IsAssignableFrom(typeof(TEntity)))
       {
-        var filter = ((IQueryable<ICodeState>)qry);
+        var filter = (IQueryable<ICodeState>)qry;
 
         qry = filter.Where(x => x.State != StateEnum.D).Cast<TEntity>();
       }

@@ -21,11 +21,11 @@ namespace dotnet.Controllers
     [HttpGet("{id}")]
     public virtual Task<VModel?> GetAsync([FromRoute] TKey id)
     {
-       throw Core::NotImplementedException.Create();
+      throw Core::NotImplementedException.Create();
     }
 
     [HttpPost("list")]
-    public virtual Task<Core::PagedDataViewModel<VModel>> ListAsync([FromBody] Core::PagedDataViewModel<QModel> model)
+    public virtual Task<Core::PagedData<VModel>> ListAsync([FromBody] Core::PagedData<QModel> model)
     {
       throw Core::NotImplementedException.Create();
     }

@@ -23,7 +23,7 @@ namespace dotnet.Core
           exp = ServerErrorException.Internal();
         }
 
-        context.Result = new ObjectResult(new APIResponseViewModel(exp)) { StatusCode = exp.StatusCode };
+        context.Result = new ObjectResult(new ResponseViewModel<object>(exp)) { StatusCode = exp.StatusCode };
         context.ExceptionHandled = true;
       }
 
