@@ -15,8 +15,20 @@ namespace dotnet.Core
     {
       if (context.Result is ObjectResult result && result.Value != null)
       {
-        if (result.Value.GetType().IsGenericType &&
-           result.Value.GetType().GetGenericTypeDefinition().IsAssignableTo(typeof(PagedData<>)))
+        // For APIController behavior - Model validation failed
+        if (context.Result is BadRequestObjectResult bad)
+        {
+          try
+          {
+            ModelValidationException.ThrowIfInvalid(false);
+          }
+          catch (BaseException exp)
+          {
+            context.Result = new ObjectResult(new ResponseViewModel<object>(exp)) { StatusCode = exp.StatusCode };
+          }
+        }
+        else if (result.Value.GetType().IsGenericType &&
+                   result.Value.GetType().GetGenericTypeDefinition().IsAssignableTo(typeof(PagedData<>)))
         {
           var paged = (IPagedData<object>)result.Value;
           context.Result = new ObjectResult(new ResponseViewModel<object>(paged.GetPaged(), paged.GetList()));

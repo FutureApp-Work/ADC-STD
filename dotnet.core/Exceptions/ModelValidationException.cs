@@ -14,12 +14,17 @@ namespace dotnet.Core
 
     #region Public Functions ##############################################################################################################
 
-    public static void ThrowIfInvalid(ModelStateDictionary state)
+    public static void ThrowIfInvalid(bool isValid)
     {
-      if (!state.IsValid)
+      if (!isValid)
       {
         throw new ModelValidationException();
       }
+    }
+
+    public static void ThrowIfInvalid(ModelStateDictionary state)
+    {
+      ThrowIfInvalid(state.IsValid);
     }
 
     #endregion ############################################################################################################################
