@@ -1,0 +1,103 @@
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore packages
+      run: dotnet restore ADC-STD-api/dotnet.template.sln
+
+    - name: Build solution
+      run: dotnet build ADC-STD-api/dotnet.template.sln --configuration Release --no-restore
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-${{ matrix.os }}
+        path: |
+          **/bin/Release/
+          **/obj/
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore packages
+      run: dotnet restore ADC-STD-api/dotnet.template.sln
+
+    - name: Build solution
+      run: dotnet build ADC-STD-api/dotnet.template.sln --configuration Release --no-restore
+
+    - name: Run Unit Tests (dotnet.models.testing)
+      run: dotnet test ADC-STD-api/dotnet.models.testing/dotnet.models.testing.csproj --configuration Release --no-build --logger "trx;LogFileName=models-test-results.trx" --verbosity normal
+
+    - name: Run API Tests (dotnet.services.testing)
+      run: dotnet test ADC-STD-api/dotnet.services.testing/dotnet.services.testing.csproj --configuration Release --no-build --logger "trx;LogFileName=services-test-results.trx" --verbosity normal
+
+    - name: Generate Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: .NET Test Results (${{ matrix.os }})
+        path: '**/TestResults/*.trx'
+        reporter: dotnet-trx
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.os }}
+        path: '**/TestResults/'
+
+  code-quality:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore packages
+      run: dotnet restore ADC-STD-api/dotnet.template.sln
+
+    - name: Run dotnet format (check only)
+      run: dotnet format ADC-STD-api/dotnet.template.sln --verify-no-changes --verbosity diagnostic
+
+    - name: Run code analysis
+      run: dotnet build ADC-STD-api/dotnet.template.sln --configuration Release --verbosity normal /p:TreatWarningsAsErrors=false
