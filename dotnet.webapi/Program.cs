@@ -1,15 +1,24 @@
 using dotnet.Core;
 using dotnet.Extensions;
 using dotnet.Services.Testing;
+using dotnet.models.testing.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<TestingDBContext>(options =>
+{
+  options.UseMySql(builder.Configuration.GetConnectionString("TestingDB"),
+                   MariaDbServerVersion.Create(new Version(11, 8), ServerType.MariaDb));
+});
+
+builder.Services.AddDbContext<AdcDbContext>(options =>
 {
   options.UseMySql(builder.Configuration.GetConnectionString("TestingDB"),
                    MariaDbServerVersion.Create(new Version(11, 8), ServerType.MariaDb));
@@ -79,12 +88,27 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Configure JWT settings
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var jwtSecret = jwtSettings.GetValue<string>("Secret") ?? "your-super-secret-key-that-is-32-chars-long!";
+var jwtIssuer = jwtSettings.GetValue<string>("Issuer") ?? "ADC-STD";
+var jwtAudience = jwtSettings.GetValue<string>("Audience") ?? "ADC-STD-Client";
+
 // Add authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // JWT configuration would go here - for now, we just need the scheme registered
-        // Real configuration should be loaded from appsettings.json
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            ClockSkew = TimeSpan.Zero
+        };
     });
 
 var app = builder.Build();

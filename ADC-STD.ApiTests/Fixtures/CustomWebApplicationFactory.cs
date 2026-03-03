@@ -18,11 +18,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         
         builder.ConfigureTestServices(services =>
         {
-            // Remove the real IPatientService registration
+            // Remove the real service registrations
             services.RemoveAll<IPatientService>();
+            services.RemoveAll<IAuthService>();
             
-            // Register mock patient service
+            // Register mock services
             services.AddScoped<IPatientService, MockPatientService>();
+            services.AddScoped<IAuthService, MockAuthService>();
             
             // Add authentication for testing
             services.AddAuthentication(options =>
