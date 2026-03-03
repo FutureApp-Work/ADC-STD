@@ -1,0 +1,60 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+      
+      - name: Restore
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build -c Release
+      
+      - name: Test
+        run: dotnet test --verbosity normal
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          log-public-key: false
+      
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H spark-vm.futureapp.work >> ~/.ssh/known_hosts
+      
+      - name: Deploy via SSH
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: spark-vm.futureapp.work
+        run: |
+          ssh $SSH_USER@$SSH_HOST << 'EOF'
+            cd /opt/adc-std
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
+          EOF
+      
+      - name: Health check
+        run: |
+          sleep 10
+          ssh $SSH_USER@$SSH_HOST "docker compose ps"
