@@ -1,4 +1,4 @@
-using dotnet.core.Models;
+using dotnet.Core;
 using dotnet.models.testing.ViewModels;
 using dotnet.services.testing.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +9,7 @@ namespace dotnet.webapi.Controllers.App001
     [ApiController]
     [Route("app001")]
     [Authorize]
-    public class PatientController : APIBaseController
+    public class PatientController : ControllerBase
     {
         private readonly IPatientService _patientService;
         private readonly ILogger<PatientController> _logger;
@@ -40,20 +40,12 @@ namespace dotnet.webapi.Controllers.App001
                 };
 
                 var result = await _patientService.GetPatientListAsync(request);
-                return Ok(new ResponseViewModel<PatientListResponse>
-                {
-                    Success = true,
-                    Data = result
-                });
+                return Ok(new ResponseViewModel<PatientListResponse>(result));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting patient list");
-                return BadRequest(new ResponseViewModel<PatientListResponse>
-                {
-                    Success = false,
-                    Message = ex.Message
-                });
+                return BadRequest(new { Code = 1, Message = ex.Message });
             }
         }
 
@@ -66,27 +58,15 @@ namespace dotnet.webapi.Controllers.App001
                 var result = await _patientService.GetPrescriptionDetailAsync(id);
                 if (result == null)
                 {
-                    return NotFound(new ResponseViewModel<PrescriptionDetailResponse>
-                    {
-                        Success = false,
-                        Message = "Prescription not found"
-                    });
+                    return NotFound(new { Code = 404, Message = "Prescription not found" });
                 }
 
-                return Ok(new ResponseViewModel<PrescriptionDetailResponse>
-                {
-                    Success = true,
-                    Data = result
-                });
+                return Ok(new ResponseViewModel<PrescriptionDetailResponse>(result));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting prescription detail");
-                return BadRequest(new ResponseViewModel<PrescriptionDetailResponse>
-                {
-                    Success = false,
-                    Message = ex.Message
-                });
+                return BadRequest(new { Code = 1, Message = ex.Message });
             }
         }
     }

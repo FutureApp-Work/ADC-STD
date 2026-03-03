@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace dotnet.models.testing.Entities
 {
@@ -72,5 +73,6 @@ namespace dotnet.models.testing.Entities
         // Navigation properties
         public virtual ICollection<ActionHistory> ActionHistories { get; set; } = new List<ActionHistory>();
         public virtual ICollection<Storage> Storages { get; set; } = new List<Storage>();
+        public virtual ICollection<PrescriptionDetail> PrescriptionDetails { get; set; } = new List<PrescriptionDetail>();
     }
 }

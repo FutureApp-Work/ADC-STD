@@ -2,6 +2,7 @@ using dotnet.models.testing.Data;
 using dotnet.models.testing.Entities;
 using dotnet.models.testing.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace dotnet.services.testing.Services
 {
@@ -53,10 +54,10 @@ namespace dotnet.services.testing.Services
                     Number = p.Number,
                     Name = p.Name,
                     Gender = p.Gender,
-                    Birthday = p.Birthday?.ToString("yyyy-MM-dd"),
+                    Birthday = p.Birthday != null ? p.Birthday.Value.ToString("yyyy-MM-dd") : null,
                     BedNumber = p.BedNumber,
                     StationId = p.StationId,
-                    StationName = p.Station != null ? p.Station.Name : null
+                    StationName = p.Station != null ? p.Station.Name : string.Empty
                 })
                 .ToListAsync();
 
