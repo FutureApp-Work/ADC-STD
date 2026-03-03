@@ -1,3 +1,4 @@
+using dotnet.models.testing.Data;
 using dotnet.models.testing.Entities;
 using dotnet.models.testing.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -6,10 +7,10 @@ namespace dotnet.services.testing.Services
 {
     public class PatientService : IPatientService
     {
-        private readonly DbContext _adcDbContext;
+        private readonly AdcDbContext _adcDbContext;
         private readonly ILogger<PatientService> _logger;
 
-        public PatientService(DbContext adcDbContext, ILogger<PatientService> logger)
+        public PatientService(AdcDbContext adcDbContext, ILogger<PatientService> logger)
         {
             _adcDbContext = adcDbContext;
             _logger = logger;
