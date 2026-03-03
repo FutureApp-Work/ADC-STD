@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet restore
+RUN dotnet build -c Release
+
+# Set entrypoint to run tests at runtime (so volume mount works)
+ENTRYPOINT ["dotnet", "test", "--logger:trx", "--results-directory", "/test-results"]
