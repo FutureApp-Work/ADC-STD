@@ -1,8 +1,8 @@
-﻿namespace dotnet.Core
+namespace dotnet.Core
 {
   public class ResponseViewModel<TModel> : PagedData<TModel>
   {
-    private ResponseViewModel() { }
+    public ResponseViewModel() { }
 
     public ResponseViewModel(BaseException exp)
     {
