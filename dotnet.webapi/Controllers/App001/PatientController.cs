@@ -40,7 +40,7 @@ namespace dotnet.webapi.Controllers.App001
                 };
 
                 var result = await _patientService.GetPatientListAsync(request);
-                return Ok(new ResponseViewModel<PatientListResponse>(result));
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -58,10 +58,10 @@ namespace dotnet.webapi.Controllers.App001
                 var result = await _patientService.GetPrescriptionDetailAsync(id);
                 if (result == null)
                 {
-                    return NotFound(new { Code = 404, Message = "Prescription not found" });
+                    return NotFound();
                 }
 
-                return Ok(new ResponseViewModel<PrescriptionDetailResponse>(result));
+                return Ok(result);
             }
             catch (Exception ex)
             {

@@ -35,7 +35,7 @@ namespace dotnet.Core
         }
         else
         {
-          context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value));
+          context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value)) { StatusCode = result.StatusCode };
         }
       }
 
