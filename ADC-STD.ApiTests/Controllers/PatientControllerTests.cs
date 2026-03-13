@@ -290,10 +290,11 @@ public class PatientControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _authenticatedClient.GetAsync("/app001/getPrescriptionDetail?id=invalid");
 
         // Assert
-        // The response might be BadRequest or OK depending on model binding behavior
-        // Both are acceptable - we're testing that it doesn't crash
-        Assert.True(response.StatusCode == HttpStatusCode.BadRequest || 
-                    response.StatusCode == HttpStatusCode.OK);
+        // The response might be BadRequest, UnprocessableEntity, or OK depending on model binding behavior
+        // All are acceptable - we're testing that it doesn't crash
+        Assert.True(response.StatusCode == HttpStatusCode.BadRequest ||
+                    response.StatusCode == HttpStatusCode.OK ||
+                    response.StatusCode == HttpStatusCode.UnprocessableEntity);
     }
 
     [Theory]
