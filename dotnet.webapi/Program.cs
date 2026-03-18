@@ -1,5 +1,7 @@
 using dotnet.Core;
 using dotnet.Extensions;
+using dotnet.models.testing.Data;
+using dotnet.services.testing.Services;
 using dotnet.Services.Testing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,15 @@ builder.Services.AddDbContext<TestingDBContext>(options =>
   options.UseMySql(builder.Configuration.GetConnectionString("TestingDB"),
                    MariaDbServerVersion.Create(new Version(11, 8), ServerType.MariaDb));
 });
+
+builder.Services.AddDbContext<AdcDbContext>(options =>
+{
+  options.UseMySql(builder.Configuration.GetConnectionString("TestingDB"),
+                   MariaDbServerVersion.Create(new Version(11, 8), ServerType.MariaDb));
+});
+
+builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IStationService, StationService>();
 
 // Add services to the container.
 builder.Services
