@@ -19,7 +19,7 @@ namespace dotnet.services.testing.Services
 
         public async Task<PatientListResponse> GetPatientListAsync(PatientListRequest request)
         {
-            var query = _adcDbContext.Set<Patient>().AsQueryable();
+            var query = _adcDbContext.Set<Patient>().Include(p => p.Station).AsQueryable();
 
             // Apply filters
             if (request.StationId.HasValue)
