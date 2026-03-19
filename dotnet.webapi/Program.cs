@@ -5,9 +5,11 @@ using dotnet.services.testing.Services;
 using dotnet.Services.Testing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,7 @@ builder.Services.AddDbContext<AdcDbContext>(options =>
 
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add services to the container.
 builder.Services
@@ -90,12 +93,22 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Add authentication
+// Configure JWT authentication
+var jwtSection = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // JWT configuration would go here - for now, we just need the scheme registered
-        // Real configuration should be loaded from appsettings.json
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSection["Issuer"],
+            ValidAudience = jwtSection["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSection["Key"]!))
+        };
     });
 
 var app = builder.Build();
