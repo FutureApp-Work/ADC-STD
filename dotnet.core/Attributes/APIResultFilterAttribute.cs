@@ -24,18 +24,30 @@ namespace dotnet.Core
           }
           catch (BaseException exp)
           {
-            context.Result = new ObjectResult(new ResponseViewModel<object>(exp)) { StatusCode = exp.StatusCode };
+            context.Result = new ObjectResult(new ResponseViewModel<object>(exp)) { StatusCode = 400 };
           }
+        }
+        // Already wrapped by the controller - don't double-wrap
+        else if (result.Value.GetType().IsGenericType &&
+                   result.Value.GetType().GetGenericTypeDefinition() == typeof(ResponseViewModel<>))
+        {
+          // No action - preserve the result as-is (including original status code)
         }
         else if (result.Value.GetType().IsGenericType &&
                    result.Value.GetType().GetGenericTypeDefinition().IsAssignableTo(typeof(PagedData<>)))
         {
           var paged = (IPagedData<object>)result.Value;
-          context.Result = new ObjectResult(new ResponseViewModel<object>(paged.GetPaged(), paged.GetList()));
+          context.Result = new ObjectResult(new ResponseViewModel<object>(paged.GetPaged(), paged.GetList()))
+          {
+            StatusCode = result.StatusCode
+          };
         }
         else
         {
-          context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value));
+          context.Result = new ObjectResult(new ResponseViewModel<object>(result.Value))
+          {
+            StatusCode = result.StatusCode
+          };
         }
       }
 
